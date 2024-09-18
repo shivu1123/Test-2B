@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            font-weight: 100;
+            font-style: normal;
+            font-size: 18px;
+            margin-left: 20px;
+        }
+        input, button {
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid black;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .error {
+            color: red;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Booking place for your dinner!</h1>
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" size="22">
+    <br>
+    <label for="phone">Phone Number:</label>
+    <input type="text" id="phone" size="22">
+    <br>
+
+    <h2>Select a time :</h2>
+    <input type="radio" id="first" name="seating" value="5:00" checked>
+    <label for="first">5:00</label><br>
+    <input type="radio" id="second" name="seating" value="6:00">
+    <label for="second">6:00</label><br>
+    <input type="radio" id="third" name="seating" value="7:00">
+    <label for="third">7:00</label><br>
+    <input type="radio" id="fourth" name="seating" value="8:00">
+    <label for="fourth">8:00</label><br>
+
+    <h2>What would you like to have with us?</h2>
+    <input type="checkbox" id="starters" name="menu" value="Starters">
+    <label for="starters">Starters</label><br>
+    <input type="checkbox" id="Main" name="menu" value="Main Course">
+    <label for="Main">Main Course</label><br>
+    <input type="checkbox" id="dessert" name="menu" value="Dessert">
+    <label for="dessert">Dessert</label><br>
+    <input type="checkbox" id="drinks" name="menu" value="Drinks">
+    <label for="drinks">Drinks</label><br>
+    <br>
+    <button onclick="bookTable()" id="bookButton" disabled>Submit</button>
+    <span id="errorText" class="error"></span>
+    <div id="bookingInfo"></div>
+
+    <script>
+        const nameBox = document.getElementById('name');
+        const phoneBox = document.getElementById('phone');
+        const bookButton = document.getElementById('bookButton');
+        const errorText = document.getElementById('errorText');
+        const bookingInfo = document.getElementById('bookingInfo');
+
+        let nameTyped = false;
+        let phoneTyped = false;
+
+        function checkName() {
+            const fullName = nameBox.value.trim();
+            if (fullName === '') {
+                return 'Error: Name is empty';
+            } else if (fullName.indexOf(' ') === -1) {
+                return 'Error: First and last names are required';
+            } else if (!/^[a-zA-Z\s]+$/.test(fullName)) {
+                return 'Error: Name should only contain alphabets';
+            }
+            return '';
+        }
+
+        function checkPhone() {
+            const phoneNumber = phoneBox.value.trim();
+            if (phoneNumber === '') {
+                return 'Error: Phone number is empty';
+            } else if (phoneNumber.length !== 6) {
+                return 'Error: Phone numbers must have exactly 6 characters';
+            } else if (!/^[0-9]/.test(phoneNumber)) {
+                return 'Error: Phone number must start with numbers';
+            }
+            return '';
+        }
+
+        function checkInputs() {
+            let errorMsg = '';
+            let nameError = '';
+            let phoneError = '';
+
+            if (nameTyped) {
+                nameError = checkName();
+                if (nameError) {
+                    errorMsg += nameError + '<br>';
+                    nameBox.style.backgroundColor = 'red';
+                } else {
+                    nameBox.style.backgroundColor = 'white';
+                }
+            }
+
+            if (phoneTyped) {
+                phoneError = checkPhone();
+                if (phoneError) {
+                    errorMsg += phoneError;
+                    phoneBox.style.backgroundColor = 'red';
+                } else {
+                    phoneBox.style.backgroundColor = 'white';
+                }
+            }
+
+            errorText.innerHTML = errorMsg;
+            bookButton.disabled = (nameError !== '' || phoneError !== '' || !nameTyped || !phoneTyped);
+        }
+
+        nameBox.addEventListener('input', function() {
+            if (!nameTyped) nameTyped = true;
+            checkInputs();
+        });
+
+        phoneBox.addEventListener('input', function() {
+            if (!phoneTyped) phoneTyped = true;
+            checkInputs();
+        });
+
+        function bookTable() {
+            const fullName = nameBox.value.trim();
+            const chosenTime = document.querySelector('input[name="seating"]:checked').value;
+            const chosenItems = Array.from(document.querySelectorAll('input[name="menu"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            let bookingMessage = `Reservation for: ${fullName}`;
+            bookingMessage += ` at: ${chosenTime}`;
+            bookingMessage += ` Starters are: ${chosenItems.join(', ') || 'None'}`;
+
+            errorText.innerHTML = '';
+            bookingInfo.innerHTML = bookingMessage;
+        }
+    </script>
+</body>
+</html>
